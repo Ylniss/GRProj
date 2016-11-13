@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace ArcheryGame
 {
@@ -12,10 +13,28 @@ namespace ArcheryGame
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        Camera Camera;
+
+        Matrix projectionMatrix;
+        Matrix viewMatrix;
+        Matrix worldMatrix;
+
+        Archer archer;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            Window.Title = "Archer3D";
+            graphics.PreferredBackBufferWidth = 1024;
+            graphics.PreferredBackBufferHeight = 600;
+            graphics.ApplyChanges();
+
             Content.RootDirectory = "Content";
+            // Here we instance the camera, setting its position, target, rotation, whether it is orthographic,
+            // then finally the near and far plane distances from the camera.
+            Camera = new Camera(this, new Vector3(0, 0, 275), Vector3.Forward, Vector3.Zero, false, 200, 325);
+
+            archer = new Archer(this);
         }
 
         /// <summary>
@@ -26,7 +45,11 @@ namespace ArcheryGame
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            ArcheryGame.Services.Initialize(this, graphics.GraphicsDevice, Camera);
+
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
+            viewMatrix = Matrix.CreateLookAt(Camera.Position, Camera.Target, new Vector3(0f, 1f, 0f));
+            worldMatrix = Matrix.CreateWorld(Camera.Target, Vector3.Forward, Vector3.Up);
 
             base.Initialize();
         }
@@ -40,6 +63,7 @@ namespace ArcheryGame
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            archer.LoadContent(Content, "mech1");
             // TODO: use this.Content to load your game content here
         }
 
@@ -62,7 +86,7 @@ namespace ArcheryGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            viewMatrix = Matrix.CreateLookAt(Camera.Position, Camera.Target, Vector3.Up);
 
             base.Update(gameTime);
         }
@@ -75,7 +99,28 @@ namespace ArcheryGame
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            foreach (var gameObj in Components)
+            {
+                Model model = null;
+                if (gameObj is DrawableGameObject)
+                    model = (gameObj as DrawableGameObject).Model;
+                else
+                    continue;
+
+                foreach (ModelMesh mesh in model.Meshes)
+                {
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        //effect.EnableDefaultLighting();
+                        effect.AmbientLightColor = new Vector3(1f, 0, 0);
+                        effect.View = viewMatrix;
+                        effect.World = worldMatrix;
+                        effect.Projection = projectionMatrix;
+                    }
+                    mesh.Draw();
+                }
+            }
+
 
             base.Draw(gameTime);
         }
