@@ -38,7 +38,6 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Archer.cs" />
     <Compile Include="Arrow.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Floor.cs" />

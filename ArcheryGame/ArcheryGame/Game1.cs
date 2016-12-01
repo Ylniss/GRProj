@@ -7,10 +7,10 @@ namespace ArcheryGame
 {
     public class Game1 : Game
     {
+        SpriteFont font;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
-        Camera Camera;
+        Camera camera;
         Floor floor;
 
         BasicEffect effect;
@@ -19,10 +19,6 @@ namespace ArcheryGame
         Matrix viewMatrix;
         Matrix worldMatrix;
 
-        float ms = 20;
-        float total = 0;
-
-        Archer archer;
         Arrow arrow;
 
         public Game1()
@@ -34,29 +30,20 @@ namespace ArcheryGame
             graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
-            archer = new Archer(this);
-            //archer.Position = new Vector3(0,0, 0);
-   
-            // Here we instance the camera, setting its position, target, rotation, whether it is orthographic,
-            // then finally the near and far plane distances from the camera.
-            Camera = new Camera(this, new Vector3(10, 1, 300), Vector3.Zero, Vector3.Zero, false, 1, 1000);
-            Camera.Initialize();
-           
-
-
         }
 
         protected override void Initialize()
         {
-            ArcheryGame.Services.Initialize(this, graphics.GraphicsDevice, Camera);
-
-            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
-            viewMatrix = Matrix.CreateLookAt(Camera.Position, Camera.Target, new Vector3(0f, 1f, 0f));
-            worldMatrix = Matrix.CreateWorld(Camera.Target, Vector3.Forward, Vector3.Up);
+            camera = new Camera(this, new Vector3(0, 2, 0), Vector3.Zero, 10);
+            camera.Initialize();
 
             floor = new Floor(graphics.GraphicsDevice, 300, 300);
             effect = new BasicEffect(graphics.GraphicsDevice);
             arrow = new Arrow(this);
+
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
+            viewMatrix = camera.View;
+            worldMatrix = Matrix.Identity;
 
             base.Initialize();
         }
@@ -65,8 +52,8 @@ namespace ArcheryGame
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            archer.LoadContent(Content, "mech1");
             arrow.LoadContent(Content, "Arrow");
+            font = Content.Load<SpriteFont>("Standard");
         }
 
         protected override void UnloadContent()
@@ -77,27 +64,15 @@ namespace ArcheryGame
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            total += gameTime.ElapsedGameTime.Milliseconds;
-
-            if (total >= ms)
             {
-                total -= ms;
-                var keyboardState = Keyboard.GetState();
-                if (keyboardState.IsKeyDown(Keys.Up))
-                    Camera.Position += Vector3.Forward;
-                else if (keyboardState.IsKeyDown(Keys.Down))
-                    Camera.Position += Vector3.Backward;
-                if (keyboardState.IsKeyDown(Keys.Right))
-                    Camera.Position += Vector3.Right;
-                else if (keyboardState.IsKeyDown(Keys.Left))
-                    Camera.Position += Vector3.Left;
+                Exit();
+                return;
             }
 
+            camera.Update(gameTime);
             arrow.Update(gameTime);
-
-            viewMatrix = Matrix.CreateLookAt(Camera.Position, Camera.Target, Vector3.Up);
+       
+            viewMatrix = camera.View;
 
             base.Update(gameTime);
         }
@@ -128,7 +103,13 @@ namespace ArcheryGame
                 }
             }
 
-            floor.Draw(Camera, effect);
+            floor.Draw(camera, effect);
+
+            var cameraPosition = camera.Position;
+            var message = string.Format("Camera X: {0}\nCamera Y: {1}\nCamera Z: {2}", cameraPosition.X, cameraPosition.Y, cameraPosition.Z);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(font, message, Vector2.Zero, Color.Black);
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }

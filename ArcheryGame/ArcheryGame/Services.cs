@@ -68,6 +68,7 @@ namespace ArcheryGame
             get { return graphics.ScissorRectangle.Width; }
         }
         #endregion
+
         #region Constructor
         /// <summary>
         /// This is the constructor for the Services
