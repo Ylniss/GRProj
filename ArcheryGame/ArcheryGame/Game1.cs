@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ArcheryGame.TerrainGeneration;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -7,19 +8,22 @@ namespace ArcheryGame
 {
     public class Game1 : Game
     {
-        SpriteFont font;
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Camera camera;
-        Floor floor;
+        private SpriteFont font;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
 
-        BasicEffect effect;
+        private Camera camera;
+        private BasicEffect effect;
 
-        Matrix projectionMatrix;
-        Matrix viewMatrix;
-        Matrix worldMatrix;
+        private Matrix projectionMatrix;
+        private Matrix viewMatrix;
+        private Matrix worldMatrix;
 
-        Arrow arrow;
+        private TerrainGenerator terrain;
+
+        //private Floor floor;
+
+        private Arrow arrow;
 
         public Game1()
         {
@@ -34,10 +38,15 @@ namespace ArcheryGame
 
         protected override void Initialize()
         {
-            camera = new Camera(this, new Vector3(0, 2, 0), Vector3.Zero, 10);
+            camera = new Camera(this, new Vector3(0, 30, 0), Vector3.Zero, 10);
             camera.Initialize();
 
-            floor = new Floor(graphics.GraphicsDevice, 300, 300);
+            ArcheryGame.Services.Initialize(this, GraphicsDevice, camera);
+
+            terrain = new TerrainGenerator(Content, "grass", "heightmap");
+            terrain.Initialize();
+
+            //floor = new Floor(graphics.GraphicsDevice, 300, 300);
             effect = new BasicEffect(graphics.GraphicsDevice);
             arrow = new Arrow(this);
 
@@ -81,6 +90,21 @@ namespace ArcheryGame
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            DrawModels();
+
+            //floor.Draw(effect);
+            terrain.DrawTerrain(viewMatrix, projectionMatrix);
+
+            var cameraPosition = camera.Position;
+            var message = string.Format("Camera X: {0}\nCamera Y: {1}\nCamera Z: {2}", cameraPosition.X, cameraPosition.Y, cameraPosition.Z);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(font, message, Vector2.Zero, Color.Black);
+            spriteBatch.End();
+            base.Draw(gameTime);
+        }
+
+        private void DrawModels()
+        {
             foreach (var gameObj in Components)
             {
                 Model model = null;
@@ -102,15 +126,7 @@ namespace ArcheryGame
                     mesh.Draw();
                 }
             }
-
-            floor.Draw(camera, effect);
-
-            var cameraPosition = camera.Position;
-            var message = string.Format("Camera X: {0}\nCamera Y: {1}\nCamera Z: {2}", cameraPosition.X, cameraPosition.Y, cameraPosition.Z);
-            spriteBatch.Begin();
-            spriteBatch.DrawString(font, message, Vector2.Zero, Color.Black);
-            spriteBatch.End();
-            base.Draw(gameTime);
         }
+
     }
 }

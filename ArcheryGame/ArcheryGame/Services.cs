@@ -76,7 +76,7 @@ namespace ArcheryGame
         /// </summary>
         private Services(Game game)
         {
-
+            
         }
         #endregion
 

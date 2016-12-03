@@ -24,11 +24,11 @@ namespace ArcheryGame
             BuildFloorBuffer();
         }
 
-        public void Draw(Camera camera, BasicEffect effect)
+        public void Draw(BasicEffect effect)
         {
             effect.VertexColorEnabled = true;
-            effect.View = camera.View;
-            effect.Projection = camera.Projection;
+            effect.View = Services.Camera.View;
+            effect.Projection = Services.Camera.Projection;
             effect.World = Matrix.Identity;
 
             foreach (var pass in effect.CurrentTechnique.Passes)
