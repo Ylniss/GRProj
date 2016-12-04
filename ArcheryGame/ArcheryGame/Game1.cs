@@ -1,4 +1,5 @@
-﻿using ArcheryGame.TerrainGeneration;
+﻿using ArcheryGame.GameObjects;
+using ArcheryGame.TerrainGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,6 +14,7 @@ namespace ArcheryGame
         private SpriteBatch spriteBatch;
 
         private Camera camera;
+        private Archer archer;
         private BasicEffect effect;
 
         private Matrix projectionMatrix;
@@ -20,8 +22,6 @@ namespace ArcheryGame
         private Matrix worldMatrix;
 
         private TerrainGenerator terrain;
-
-        //private Floor floor;
 
         private Arrow arrow;
 
@@ -38,10 +38,13 @@ namespace ArcheryGame
 
         protected override void Initialize()
         {
-            camera = new Camera(this, new Vector3(0, 30, 0), Vector3.Zero, 10);
+            camera = new Camera(this, new Vector3(0, 30, 0), Vector3.Zero);
             camera.Initialize();
 
             ArcheryGame.Services.Initialize(this, GraphicsDevice, camera);
+
+            archer = new Archer(this, new Vector3(0, 30, 0), Vector3.Zero, 10);
+            archer.Initialize();
 
             terrain = new TerrainGenerator(Content, "grass", "heightmap");
             terrain.Initialize();
@@ -67,7 +70,6 @@ namespace ArcheryGame
 
         protected override void UnloadContent()
         {
-
         }
 
         protected override void Update(GameTime gameTime)
@@ -78,6 +80,7 @@ namespace ArcheryGame
                 return;
             }
 
+            archer.Update(gameTime);
             camera.Update(gameTime);
             arrow.Update(gameTime);
        
@@ -92,7 +95,6 @@ namespace ArcheryGame
 
             DrawModels();
 
-            //floor.Draw(effect);
             terrain.DrawTerrain(viewMatrix, projectionMatrix);
 
             var cameraPosition = camera.Position;
@@ -109,15 +111,17 @@ namespace ArcheryGame
 
             foreach (var gameObj in Components)
             {
+                //TODO model łucznika.
+                if (gameObj is Archer) continue;
+
                 Model model = null;
                 if (gameObj is DrawableGameObject)
-                {
                     model = (gameObj as DrawableGameObject).Model;
-                }
                 else
                     continue;
 
                 var gameObject = (gameObj as DrawableGameObject);
+
                 worldMatrix = Matrix.CreateScale(gameObject.ScalePercent) * 
                     Matrix.CreateRotationX(gameObject.RotationInRadians.X) * Matrix.CreateRotationY(gameObject.RotationInRadians.Y) * Matrix.CreateRotationZ(gameObject.RotationInRadians.Z) * 
                     Matrix.CreateTranslation(gameObject.Position);
