@@ -43,13 +43,15 @@ namespace ArcheryGame.GameObjects
         private MouseState previoustMouseState;
         private MouseState prevMouseState;
 
+        private bool shoot = false;
+
         public Archer(Game game, Vector3 position, Vector3 rotation, float speed) 
             : base(game)
         {
             Position = position;
             Rotation = rotation;
             this.speed = speed;
-
+           
             previoustMouseState = Mouse.GetState();
         }
 
@@ -72,7 +74,20 @@ namespace ArcheryGame.GameObjects
 
             currentMouseState = mouseState;
 
-            if (keyboardState.IsKeyDown(Keys.W))
+            if (mouseState.LeftButton == ButtonState.Pressed && !shoot)
+            {
+                Shot();
+                shoot = true;
+             }
+
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                shoot = false;
+            }
+
+
+
+                if (keyboardState.IsKeyDown(Keys.W))
                 moveVector.Z = 1;
 
             if (keyboardState.IsKeyDown(Keys.S))
@@ -146,6 +161,14 @@ namespace ArcheryGame.GameObjects
         {
             Position = position;
             Rotation = rotation;
+        }
+
+        private void Shot()
+        {
+            var arrow = new Arrow(Game,Position);
+            arrow.LoadContent(Game.Content, "Arrow");
+            arrow.Fire();
+
         }
     }
 }

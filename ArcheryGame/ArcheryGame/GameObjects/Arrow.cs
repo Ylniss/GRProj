@@ -14,10 +14,17 @@ namespace ArcheryGame
         private bool fired;
         private float elapsed;
 
-        public Arrow(Game game) : base(game)
+        public Arrow(Game game, Vector3 position) : base(game)
         {
             fired = false;
-            Velocity.Y = 0.5f;
+            Position = position;
+            Velocity.X = 0.5f;
+           // RotationInRadians.X = MathHelper.ToRadians(45);
+            RotationInRadians.Y = MathHelper.ToRadians(45);
+            RotationInRadians.Z = MathHelper.ToRadians(-90);
+            ScalePercent = new Vector3(1, 1, 1);
+            //arrow.LoadContent(Content, "Arrow");
+         //   LoadContent(Content, "Arrow");
         }
 
         public override void Update(GameTime gameTime)
@@ -27,11 +34,18 @@ namespace ArcheryGame
             elapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (fired)
-            {    
-                Position.X = Velocity.X * (float)Math.Cos(RotationInRadians.X) * elapsed * 0.000001f;
-                Position.Y = Velocity.Y * (float)Math.Cos(RotationInRadians.Y) * elapsed * 0.000001f;
+            {
+                Position.X = Position.X + Velocity.X * (float)Math.Cos(RotationInRadians.X) * elapsed;
+                Position.Y = Position.Y  + Velocity.Y * (float)Math.Cos(RotationInRadians.Y) * elapsed * 0.01f;
             }
-           
+
         }
+
+        public void Fire()
+        {
+            fired = true;
+        }
+
+
     }
 }

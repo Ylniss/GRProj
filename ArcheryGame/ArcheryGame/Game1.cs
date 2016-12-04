@@ -3,7 +3,6 @@ using ArcheryGame.TerrainGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 
 namespace ArcheryGame
 {
@@ -23,7 +22,7 @@ namespace ArcheryGame
 
         private TerrainGenerator terrain;
 
-        private Arrow arrow;
+      //  private Arrow arrow;
 
         public Game1()
         {
@@ -32,7 +31,7 @@ namespace ArcheryGame
             graphics.PreferredBackBufferWidth = 1024;
             graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
-
+    
             Content.RootDirectory = "Content";
         }
 
@@ -51,7 +50,7 @@ namespace ArcheryGame
 
             //floor = new Floor(graphics.GraphicsDevice, 300, 300);
             effect = new BasicEffect(graphics.GraphicsDevice);
-            arrow = new Arrow(this);
+     
 
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
             viewMatrix = camera.View;
@@ -63,8 +62,8 @@ namespace ArcheryGame
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            arrow.LoadContent(Content, "Arrow");
+        
+            //arrow.LoadContent(Content, "Arrow");
             font = Content.Load<SpriteFont>("Standard");
         }
 
@@ -79,14 +78,18 @@ namespace ArcheryGame
                 Exit();
                 return;
             }
+            if (IsActive)
+            {
 
-            archer.Update(gameTime);
-            camera.Update(gameTime);
-            arrow.Update(gameTime);
-       
-            viewMatrix = camera.View;
 
-            base.Update(gameTime);
+                archer.Update(gameTime);
+                camera.Update(gameTime);
+                // arrow.Update(gameTime);
+
+                viewMatrix = camera.View;
+
+                base.Update(gameTime);
+            }
         }
 
         protected override void Draw(GameTime gameTime)
