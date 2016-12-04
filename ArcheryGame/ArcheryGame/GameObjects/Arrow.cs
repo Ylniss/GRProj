@@ -16,8 +16,8 @@ namespace ArcheryGame
 
         public Arrow(Game game) : base(game)
         {
-            fired = true;
-            Velocity.X = 0.5f;
+            fired = false;
+            Velocity.Y = 0.5f;
         }
 
         public override void Update(GameTime gameTime)
@@ -28,8 +28,8 @@ namespace ArcheryGame
 
             if (fired)
             {    
-                Position.X = Velocity.X * (float)Math.Cos(RotationInRadians.X) * elapsed;
-                Position.Y = Velocity.Y * (float)Math.Cos(RotationInRadians.Y) * elapsed;
+                Position.X = Velocity.X * (float)Math.Cos(RotationInRadians.X) * elapsed * 0.000001f;
+                Position.Y = Velocity.Y * (float)Math.Cos(RotationInRadians.Y) * elapsed * 0.000001f;
             }
            
         }

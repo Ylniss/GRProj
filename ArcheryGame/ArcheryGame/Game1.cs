@@ -105,13 +105,22 @@ namespace ArcheryGame
 
         private void DrawModels()
         {
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
             foreach (var gameObj in Components)
             {
                 Model model = null;
                 if (gameObj is DrawableGameObject)
+                {
                     model = (gameObj as DrawableGameObject).Model;
+                }
                 else
                     continue;
+
+                var gameObject = (gameObj as DrawableGameObject);
+                worldMatrix = Matrix.CreateScale(gameObject.ScalePercent) * 
+                    Matrix.CreateRotationX(gameObject.RotationInRadians.X) * Matrix.CreateRotationY(gameObject.RotationInRadians.Y) * Matrix.CreateRotationZ(gameObject.RotationInRadians.Z) * 
+                    Matrix.CreateTranslation(gameObject.Position);
 
                 foreach (ModelMesh mesh in model.Meshes)
                 {
