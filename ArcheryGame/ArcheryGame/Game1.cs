@@ -45,13 +45,11 @@ namespace ArcheryGame
             archer = new Archer(this, new Vector3(0, 30, 0), Vector3.Zero, 10);
             archer.Initialize();
 
-            terrain = new TerrainGenerator(Content, "grass", "heightmap");
+            terrain = new TerrainGenerator(Content, "grass", "sand", "stone", "heightmap4");
             terrain.Initialize();
 
-            //floor = new Floor(graphics.GraphicsDevice, 300, 300);
             effect = new BasicEffect(graphics.GraphicsDevice);
      
-
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
             viewMatrix = camera.View;
             worldMatrix = Matrix.Identity;
@@ -80,8 +78,6 @@ namespace ArcheryGame
             }
             if (IsActive)
             {
-
-
                 archer.Update(gameTime);
                 camera.Update(gameTime);
                 // arrow.Update(gameTime);

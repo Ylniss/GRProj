@@ -49,6 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services.cs" />
     <Compile Include="TerrainGeneration\TerrainGenerator.cs" />
+    <Compile Include="TerrainGeneration\VertexMultitextured.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
