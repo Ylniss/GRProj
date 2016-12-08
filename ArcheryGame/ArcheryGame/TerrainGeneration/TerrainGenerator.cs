@@ -12,9 +12,9 @@ namespace ArcheryGame.TerrainGeneration
 {
     public class TerrainGenerator
     {
-        int terrainWidth;
-        int terrainLength;
-        float[,] heightData;
+        public int TerrainWidth;
+        public int TerrainLength;
+        public float[,] HeightData;
 
         VertexBuffer terrainVertexBuffer;
         IndexBuffer terrainIndexBuffer;
@@ -22,23 +22,33 @@ namespace ArcheryGame.TerrainGeneration
 
         Effect effect;
 
+        Texture2D sandTexture;
+        Texture2D rockTexture;
         Texture2D grassTexture;
 
         private ContentManager content;
+
         private string assetGrassTexture;
+        private string assetSandTexture;
+        private string assetRockTexture;
         private string assetHeightMap;
 
-        public TerrainGenerator(ContentManager content, string assetGrassTexture, string assetHeightMap)
+        public TerrainGenerator(ContentManager content, string assetGrassTexture, string assetSandTexture, string assetRockTexture, string assetHeightMap)
         {
             this.content = content;
+
             this.assetGrassTexture = assetGrassTexture;
+            this.assetSandTexture = assetSandTexture;
+            this.assetRockTexture = assetRockTexture;
             this.assetHeightMap = assetHeightMap;
         }
 
         public void DrawTerrain(Matrix currentViewMatrix, Matrix currentProjectionMatrix)
         {
-            effect.CurrentTechnique = effect.Techniques["Textured"];
-            effect.Parameters["xTexture"].SetValue(grassTexture);
+            effect.CurrentTechnique = effect.Techniques["MultiTextured"];
+            effect.Parameters["xTexture0"].SetValue(sandTexture);
+            effect.Parameters["xTexture1"].SetValue(grassTexture);
+            effect.Parameters["xTexture2"].SetValue(rockTexture);
 
             Matrix worldMatrix = Matrix.Identity;
             effect.Parameters["xWorld"].SetValue(worldMatrix);
@@ -62,7 +72,11 @@ namespace ArcheryGame.TerrainGeneration
         public void Initialize()
         {
             effect = content.Load<Effect>("Effect");
+
             grassTexture = content.Load<Texture2D>(assetGrassTexture);
+            sandTexture = content.Load<Texture2D>(assetSandTexture);
+            rockTexture = content.Load<Texture2D>(assetRockTexture);
+
             LoadVertices();
         }
 
@@ -71,11 +85,11 @@ namespace ArcheryGame.TerrainGeneration
             Texture2D heightMap = content.Load<Texture2D>(assetHeightMap);
             LoadHeightData(heightMap);
 
-            VertexPositionNormalTexture[] terrainVertices = SetUpTerrainVertices();
+            VertexMultitextured[] terrainVertices = SetUpTerrainVertices();
             int[] terrainIndices = SetUpTerrainIndices();
             terrainVertices = CalculateNormals(terrainVertices, terrainIndices);
             CopyToTerrainBuffers(terrainVertices, terrainIndices);
-            terrainVertexDeclaration = new VertexDeclaration(VertexPositionNormalTexture.VertexDeclaration.VertexStride, VertexPositionNormalTexture.VertexDeclaration.GetVertexElements());
+            terrainVertexDeclaration = new VertexDeclaration(VertexMultitextured.VertexDeclaration.VertexStride, VertexMultitextured.VertexElements);
         }
 
         private void LoadHeightData(Texture2D heightMap)
@@ -83,37 +97,49 @@ namespace ArcheryGame.TerrainGeneration
             float minimumHeight = float.MaxValue;
             float maximumHeight = float.MinValue;
 
-            terrainWidth = heightMap.Width;
-            terrainLength = heightMap.Height;
+            TerrainWidth = heightMap.Width;
+            TerrainLength = heightMap.Height;
 
-            Color[] heightMapColors = new Color[terrainWidth * terrainLength];
+            Color[] heightMapColors = new Color[TerrainWidth * TerrainLength];
             heightMap.GetData(heightMapColors);
 
-            heightData = new float[terrainWidth, terrainLength];
-            for (int x = 0; x < terrainWidth; x++)
-                for (int y = 0; y < terrainLength; y++)
+            HeightData = new float[TerrainWidth, TerrainLength];
+            for (int x = 0; x < TerrainWidth; x++)
+                for (int y = 0; y < TerrainLength; y++)
                 {
-                    heightData[x, y] = heightMapColors[x + y * terrainWidth].R;
-                    if (heightData[x, y] < minimumHeight) minimumHeight = heightData[x, y];
-                    if (heightData[x, y] > maximumHeight) maximumHeight = heightData[x, y];
+                    HeightData[x, y] = heightMapColors[x + y * TerrainWidth].R;
+                    if (HeightData[x, y] < minimumHeight) minimumHeight = HeightData[x, y];
+                    if (HeightData[x, y] > maximumHeight) maximumHeight = HeightData[x, y];
                 }
 
-            for (int x = 0; x < terrainWidth; x++)
-                for (int y = 0; y < terrainLength; y++)
-                    heightData[x, y] = (heightData[x, y] - minimumHeight) / (maximumHeight - minimumHeight) * 30.0f;
+            for (int x = 0; x < TerrainWidth; x++)
+                for (int y = 0; y < TerrainLength; y++)
+                    HeightData[x, y] = (HeightData[x, y] - minimumHeight) / (maximumHeight - minimumHeight) * 30.0f;
         }
 
-        private VertexPositionNormalTexture[] SetUpTerrainVertices()
+        private VertexMultitextured[] SetUpTerrainVertices()
         {
-            VertexPositionNormalTexture[] terrainVertices = new VertexPositionNormalTexture[terrainWidth * terrainLength];
+            VertexMultitextured[] terrainVertices = new VertexMultitextured[TerrainWidth * TerrainLength];
 
-            for (int x = 0; x < terrainWidth; x++)
+            for (int x = 0; x < TerrainWidth; x++)
             {
-                for (int y = 0; y < terrainLength; y++)
+                for (int y = 0; y < TerrainLength; y++)
                 {
-                    terrainVertices[x + y * terrainWidth].Position = new Vector3(x, heightData[x, y], -y);
-                    terrainVertices[x + y * terrainWidth].TextureCoordinate.X = (float)x / 30.0f;
-                    terrainVertices[x + y * terrainWidth].TextureCoordinate.Y = (float)y / 30.0f;
+                    terrainVertices[x + y * TerrainWidth].Position = new Vector3(x, HeightData[x, y], -y);
+                    terrainVertices[x + y * TerrainWidth].TextureCoordinate.X = x / 30.0f;
+                    terrainVertices[x + y * TerrainWidth].TextureCoordinate.Y = y / 30.0f;
+
+                    terrainVertices[x + y * TerrainWidth].TexWeights.X = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 0) / 8.0f, 0, 1);
+                    terrainVertices[x + y * TerrainWidth].TexWeights.Y = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 12) / 6.0f, 0, 1);
+                    terrainVertices[x + y * TerrainWidth].TexWeights.Z = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 20) / 6.0f, 0, 1);
+
+                    float total = terrainVertices[x + y * TerrainWidth].TexWeights.X;
+                    total += terrainVertices[x + y * TerrainWidth].TexWeights.Y;
+                    total += terrainVertices[x + y * TerrainWidth].TexWeights.Z;
+
+                    terrainVertices[x + y * TerrainWidth].TexWeights.X /= total;
+                    terrainVertices[x + y * TerrainWidth].TexWeights.Y /= total;
+                    terrainVertices[x + y * TerrainWidth].TexWeights.Z /= total;
                 }
             }
 
@@ -122,16 +148,16 @@ namespace ArcheryGame.TerrainGeneration
 
         private int[] SetUpTerrainIndices()
         {
-            int[] indices = new int[(terrainWidth - 1) * (terrainLength - 1) * 6];
+            int[] indices = new int[(TerrainWidth - 1) * (TerrainLength - 1) * 6];
             int counter = 0;
-            for (int y = 0; y < terrainLength - 1; y++)
+            for (int y = 0; y < TerrainLength - 1; y++)
             {
-                for (int x = 0; x < terrainWidth - 1; x++)
+                for (int x = 0; x < TerrainWidth - 1; x++)
                 {
-                    int lowerLeft = x + y * terrainWidth;
-                    int lowerRight = (x + 1) + y * terrainWidth;
-                    int topLeft = x + (y + 1) * terrainWidth;
-                    int topRight = (x + 1) + (y + 1) * terrainWidth;
+                    int lowerLeft = x + y * TerrainWidth;
+                    int lowerRight = (x + 1) + y * TerrainWidth;
+                    int topLeft = x + (y + 1) * TerrainWidth;
+                    int topRight = (x + 1) + (y + 1) * TerrainWidth;
 
                     indices[counter++] = topLeft;
                     indices[counter++] = lowerRight;
@@ -146,7 +172,7 @@ namespace ArcheryGame.TerrainGeneration
             return indices;
         }
 
-        private VertexPositionNormalTexture[] CalculateNormals(VertexPositionNormalTexture[] vertices, int[] indices)
+        private VertexMultitextured[] CalculateNormals(VertexMultitextured[] vertices, int[] indices)
         {
             for (int i = 0; i < vertices.Length; i++)
                 vertices[i].Normal = new Vector3(0, 0, 0);
@@ -172,9 +198,9 @@ namespace ArcheryGame.TerrainGeneration
             return vertices;
         }
 
-        private void CopyToTerrainBuffers(VertexPositionNormalTexture[] vertices, int[] indices)
+        private void CopyToTerrainBuffers(VertexMultitextured[] vertices, int[] indices)
         {
-            terrainVertexBuffer = new VertexBuffer(Services.Graphics, VertexPositionNormalTexture.VertexDeclaration, vertices.Length * VertexPositionNormalTexture.VertexDeclaration.VertexStride, BufferUsage.WriteOnly);
+            terrainVertexBuffer = new VertexBuffer(Services.Graphics, VertexMultitextured.VertexDeclaration, vertices.Length * VertexMultitextured.VertexDeclaration.VertexStride, BufferUsage.WriteOnly);
             terrainVertexBuffer.SetData(vertices);
 
             terrainIndexBuffer = new IndexBuffer(Services.Graphics, typeof(int), indices.Length, BufferUsage.WriteOnly);

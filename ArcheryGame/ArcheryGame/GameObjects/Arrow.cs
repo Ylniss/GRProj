@@ -19,9 +19,15 @@ namespace ArcheryGame
             fired = false;
             Position = position;
             Velocity.X = 0.5f;
+<<<<<<< HEAD
             RotationInRadians.X = MathHelper.ToRadians(45);
             RotationInRadians.Y = MathHelper.ToRadians(45);
            // RotationInRadians.Z = MathHelper.ToRadians(-90);
+=======
+           // RotationInRadians.X = MathHelper.ToRadians(45);
+            RotationInRadians.X = MathHelper.ToRadians(Services.Camera.Rotation.X);
+            
+>>>>>>> origin/master
             ScalePercent = new Vector3(1, 1, 1);
             //arrow.LoadContent(Content, "Arrow");
          //   LoadContent(Content, "Arrow");
@@ -35,6 +41,7 @@ namespace ArcheryGame
 
             if (fired)
             {
+<<<<<<< HEAD
                 var direction = new Vector3(Position.X + Velocity.X * elapsed, Position.Y + Velocity.Y * elapsed,
                                       Position.Z + Velocity.Z * elapsed) - Position;
 
@@ -44,6 +51,10 @@ namespace ArcheryGame
                // Position.X = Position.X + Velocity.X  * elapsed;
               //   Position.Y = Position.Y  + Velocity.Y * (float)Math.Cos(RotationInRadians.Y) * elapsed * 0.01f;
              //   Position.Z = Position.Z + Velocity.Z * elapsed ;
+=======
+                Position.X = Position.X + Velocity.X * (float)Math.Cos(RotationInRadians.X) * elapsed;
+                Position.Y = Position.Y  + Velocity.Y * (float)Math.Sin(RotationInRadians.Y) * elapsed * 0.01f;
+>>>>>>> origin/master
             }
 
         }
