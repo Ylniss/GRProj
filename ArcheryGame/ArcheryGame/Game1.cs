@@ -78,6 +78,12 @@ namespace ArcheryGame
             }
             if (IsActive)
             {
+
+                if(Keyboard.GetState().IsKeyDown(Keys.K))
+                {
+                    archer.Arrows.Clear();
+                }
+
                 archer.Update(gameTime);
                 camera.Update(gameTime);
                 // arrow.Update(gameTime);
@@ -97,9 +103,19 @@ namespace ArcheryGame
             terrain.DrawTerrain(viewMatrix, projectionMatrix);
 
             var cameraPosition = camera.Position;
-            var message = string.Format("Camera X: {0}\nCamera Y: {1}\nCamera Z: {2}", cameraPosition.X, cameraPosition.Y, cameraPosition.Z);
+            var message = string.Format("Camera X: {0}\nCamera Y: {1}\nCamera Z: {2}\nCamera Rotation{3}\n", cameraPosition.X, cameraPosition.Y, cameraPosition.Z,camera.Rotation);
+            string message2 = string.Empty;
+            int i = 1;
+            foreach (var item in archer.Arrows)
+            {
+
+                message2 +=  string.Format("Arrow number: {0}, Position: {1}\n RotationInRadians: {2}\nRotationAcceleration: {3}\nRotationVelocity: {3}\n",i, item.Position, item.RotationInRadians, item.RotationAcceleration, item.RotationVelocity);
+                i++;
+            }
             spriteBatch.Begin();
+       
             spriteBatch.DrawString(font, message, Vector2.Zero, Color.Black);
+            spriteBatch.DrawString(font, message2, new Vector2(0, 80), Color.Black);
             spriteBatch.End();
             base.Draw(gameTime);
         }
