@@ -78,14 +78,12 @@ namespace ArcheryGame
             }
             if (IsActive)
             {
-<<<<<<< HEAD
+
                 if(Keyboard.GetState().IsKeyDown(Keys.K))
                 {
                     archer.Arrows.Clear();
                 }
 
-=======
->>>>>>> origin/master
                 archer.Update(gameTime);
                 camera.Update(gameTime);
                 // arrow.Update(gameTime);
