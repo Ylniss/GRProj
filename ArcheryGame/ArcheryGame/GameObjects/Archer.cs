@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace ArcheryGame.GameObjects
 {
@@ -34,6 +35,8 @@ namespace ArcheryGame.GameObjects
             }
         }
 
+        public List<Arrow> Arrows { get; set; }
+
         //defines speed of movement
         float speed = 10;
         float rotationSpeed = 0.1f;
@@ -51,8 +54,8 @@ namespace ArcheryGame.GameObjects
             Position = position;
             Rotation = rotation;
             this.speed = speed;
-           
-            previoustMouseState = Mouse.GetState();
+            Arrows = new List<Arrow>();
+             previoustMouseState = Mouse.GetState();
         }
 
         public override void Initialize()
@@ -166,7 +169,10 @@ namespace ArcheryGame.GameObjects
         private void Shot()
         {
             var arrow = new Arrow(Game,Position);
+            Arrows.Add(arrow);
             arrow.LoadContent(Game.Content, "Arrow");
+            arrow.Position = Position;
+            arrow.RotationInRadians = new Vector3(Rotation.X, Rotation.Y, Rotation.Z);
             arrow.Fire();
 
         }
