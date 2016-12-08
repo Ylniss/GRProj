@@ -5,6 +5,8 @@ namespace ArcheryGame.GameObjects
 {
     public class Archer : DrawableGameObject
     {
+        private float[,] heightData;
+
         private Vector3 position;
         private Vector3 rotation;
 
@@ -45,13 +47,14 @@ namespace ArcheryGame.GameObjects
 
         private bool shoot = false;
 
-        public Archer(Game game, Vector3 position, Vector3 rotation, float speed) 
+        public Archer(Game game, Vector3 position, Vector3 rotation, float speed, float[,] heightData) 
             : base(game)
         {
             Position = position;
             Rotation = rotation;
             this.speed = speed;
-           
+            this.heightData = heightData;
+
             previoustMouseState = Mouse.GetState();
         }
 
@@ -85,19 +88,19 @@ namespace ArcheryGame.GameObjects
                 shoot = false;
             }
 
-
-
-                if (keyboardState.IsKeyDown(Keys.W))
-                moveVector.Z = 1;
+            if (keyboardState.IsKeyDown(Keys.W))
+                moveVector.Z = 1.0f;
 
             if (keyboardState.IsKeyDown(Keys.S))
-                moveVector.Z = -1;
+                moveVector.Z = -1.0f;
 
             if (keyboardState.IsKeyDown(Keys.A))
-                moveVector.X = 1;
+                moveVector.X = 1.0f;
 
             if (keyboardState.IsKeyDown(Keys.D))
-                moveVector.X = -1;
+                moveVector.X = -1.0f;
+
+            position.Y = CalculateHeight(12.0f);
 
             if (moveVector != Vector3.Zero)
             {
@@ -168,7 +171,27 @@ namespace ArcheryGame.GameObjects
             var arrow = new Arrow(Game,Position);
             arrow.LoadContent(Game.Content, "Arrow");
             arrow.Fire();
+        }
 
+        private float CalculateHeight(float offset)
+        {
+            float[] closestPoints = new float[5];
+
+            closestPoints[0] = heightData[(int)position.X, (int)-position.Z];
+            closestPoints[1] = heightData[(int)position.X + 1, (int)-position.Z];
+            closestPoints[2] = heightData[(int)position.X, (int)-position.Z + 1];
+            closestPoints[3] = heightData[(int)position.X - 1, (int)-position.Z];
+            closestPoints[4] = heightData[(int)position.X, (int)-position.Z - 1];
+
+            float height = 0f;
+            foreach (float point in closestPoints)
+            {
+                height += point;
+            }
+            height /= closestPoints.Length;
+            height += offset;
+
+            return height;
         }
     }
 }

@@ -42,11 +42,11 @@ namespace ArcheryGame
 
             ArcheryGame.Services.Initialize(this, GraphicsDevice, camera);
 
-            archer = new Archer(this, new Vector3(0, 30, 0), Vector3.Zero, 10);
-            archer.Initialize();
-
-            terrain = new TerrainGenerator(Content, "grass", "sand", "stone", "heightmap4");
+            terrain = new TerrainGenerator(Content, "sand", "grass", "stone", "heightmap4");
             terrain.Initialize();
+
+            archer = new Archer(this, new Vector3(1, 30, -1), Vector3.Zero, 10, terrain.HeightData);
+            archer.Initialize();
 
             effect = new BasicEffect(graphics.GraphicsDevice);
      
@@ -90,7 +90,7 @@ namespace ArcheryGame
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             DrawModels();
 
