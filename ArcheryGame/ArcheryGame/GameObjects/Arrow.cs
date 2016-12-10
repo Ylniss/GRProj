@@ -13,6 +13,18 @@ namespace ArcheryGame
 
         private bool fired;
         private float elapsed;
+        public Vector3 Direction { get; set; }
+
+        public override Matrix WorldMatrix
+        {
+            get
+            {
+                return Matrix.CreateRotationX(MathHelper.ToRadians(90) + RotationInRadians.X) *
+                    Matrix.CreateRotationZ(RotationInRadians.Z) *
+                     Matrix.CreateRotationY(RotationInRadians.Y)
+                    * Matrix.CreateTranslation(Position);
+            }
+        }
 
         public Arrow(Game game, Vector3 position) : base(game)
         {
@@ -20,14 +32,10 @@ namespace ArcheryGame
             Position = position;
             Velocity.X = 0.5f;
 
-            RotationInRadians.X = MathHelper.ToRadians(45);
-            RotationInRadians.Y = MathHelper.ToRadians(45);
-
-            
+            RotationInRadians.X = MathHelper.ToRadians(90);
+            RotationInRadians.Z = MathHelper.ToRadians(45);
 
             ScalePercent = new Vector3(1, 1, 1);
-            //arrow.LoadContent(Content, "Arrow");
-         //   LoadContent(Content, "Arrow");
         }
 
         public override void Update(GameTime gameTime)
@@ -38,13 +46,13 @@ namespace ArcheryGame
 
             if (fired)
             {
-                var direction = new Vector3(Position.X + Velocity.X * elapsed, Position.Y + Velocity.Y * elapsed,
-                                      Position.Z + Velocity.Z * elapsed) - Position;
+     
 
-                direction.Normalize(); //make it a unit vector
-                var angle = (float)Math.Atan2(-direction.X, direction.Y);
-                Position += direction * 10.0f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                var rotationMatrix = Matrix.CreateRotationX(Direction.X) * Matrix.CreateRotationY(Direction.Y);
 
+                Vector3 lookAtOffset = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
+
+               Position += lookAtOffset * 10.0f * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
         }
