@@ -22,7 +22,8 @@ namespace ArcheryGame
 
         private TerrainGenerator terrain;
 
-      //  private Arrow arrow;
+        //  private Arrow arrow;
+        private Skydome sky;
 
         public Game1()
         {
@@ -48,6 +49,13 @@ namespace ArcheryGame
             archer = new Archer(this, new Vector3(1, 30, -1), Vector3.Zero, 10, terrain.HeightData);
             archer.Initialize();
 
+            sky = new Skydome(this);
+            sky.Initialize();
+
+            sky.Position = new Vector3(50, 40, -50);
+            sky.ScalePercent = new Vector3(15, 15, 15);
+            sky.RotationInRadians = new Vector3(1, 90, 90);
+
             effect = new BasicEffect(graphics.GraphicsDevice);
      
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
@@ -60,7 +68,9 @@ namespace ArcheryGame
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-        
+
+            sky.LoadContent(Content, "skydome");
+
             //arrow.LoadContent(Content, "Arrow");
             font = Content.Load<SpriteFont>("Standard");
         }
@@ -86,6 +96,7 @@ namespace ArcheryGame
 
                 archer.Update(gameTime);
                 camera.Update(gameTime);
+                sky.Update(gameTime);
                 // arrow.Update(gameTime);
 
                 viewMatrix = camera.View;
