@@ -37,6 +37,8 @@ namespace ArcheryGame.GameObjects
             }
         }
 
+
+
         public List<Arrow> Arrows { get; set; }
 
         //defines speed of movement
@@ -177,7 +179,9 @@ namespace ArcheryGame.GameObjects
             Arrows.Add(arrow);
             arrow.LoadContent(Game.Content, "Arrow");
             arrow.Position = Position;
-            arrow.RotationInRadians = new Vector3(Rotation.X, Rotation.Y, Rotation.Z);
+            arrow.Direction = Rotation;
+            arrow.RotationInRadians = new Vector3(Rotation.X, Rotation.Y, Rotation.Z + 45); 
+            //    arrow.Direction.Normalize();
             arrow.Fire();
         }
 

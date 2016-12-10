@@ -21,6 +21,16 @@ namespace ArcheryGame
         public Vector3 ScalePercent;
         public Vector3 RotationVelocity;
         public Vector3 RotationAcceleration;
+
+         public virtual Matrix WorldMatrix
+        {
+            get
+            {
+                return Matrix.CreateScale(ScalePercent) *
+                      Matrix.CreateRotationX(RotationInRadians.X) * Matrix.CreateRotationY(RotationInRadians.Y) * Matrix.CreateRotationZ(RotationInRadians.Z) *
+                      Matrix.CreateTranslation(Position);
+            }
+        }
         #endregion
 
         #region Constructor

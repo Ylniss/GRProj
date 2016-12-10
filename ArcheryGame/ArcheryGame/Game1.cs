@@ -3,6 +3,7 @@ using ArcheryGame.TerrainGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace ArcheryGame
 {
@@ -82,6 +83,11 @@ namespace ArcheryGame
                 if(Keyboard.GetState().IsKeyDown(Keys.K))
                 {
                     archer.Arrows.Clear();
+                    var arrows = Components.Where(x => x.GetType() == typeof(Arrow)).ToList();
+                 
+                    for (int i = 0; i < arrows.Count(); i++)
+                        Components.Remove(arrows[i]);
+
                 }
 
                 archer.Update(gameTime);
@@ -137,18 +143,15 @@ namespace ArcheryGame
 
                 var gameObject = (gameObj as DrawableGameObject);
 
-                worldMatrix = Matrix.CreateScale(gameObject.ScalePercent) * 
-                    Matrix.CreateRotationX(gameObject.RotationInRadians.X) * Matrix.CreateRotationY(gameObject.RotationInRadians.Y) * Matrix.CreateRotationZ(gameObject.RotationInRadians.Z) * 
-                    Matrix.CreateTranslation(gameObject.Position);
 
                 foreach (ModelMesh mesh in model.Meshes)
                 {
                     foreach (BasicEffect effect in mesh.Effects)
                     {
-                        //effect.EnableDefaultLighting();
+                        effect.EnableDefaultLighting();
                         effect.AmbientLightColor = new Vector3(1f, 0, 0);
                         effect.View = viewMatrix;
-                        effect.World = worldMatrix;
+                        effect.World = gameObject.WorldMatrix;
                         effect.Projection = projectionMatrix;
                     }
                     mesh.Draw();
