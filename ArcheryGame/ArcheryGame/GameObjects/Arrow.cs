@@ -19,10 +19,10 @@ namespace ArcheryGame
         {
             get
             {
-                return Matrix.CreateRotationX(MathHelper.ToRadians(90) + RotationInRadians.X) *
+                return Matrix.CreateRotationX(RotationInRadians.X) *
+                    Matrix.CreateRotationY(RotationInRadians.Y)*
                     Matrix.CreateRotationZ(RotationInRadians.Z) *
-                     Matrix.CreateRotationY(RotationInRadians.Y)
-                    * Matrix.CreateTranslation(Position);
+                     Matrix.CreateTranslation(Position);
             }
         }
 
@@ -32,8 +32,8 @@ namespace ArcheryGame
             Position = position;
             Velocity.X = 0.5f;
 
-            RotationInRadians.X = MathHelper.ToRadians(90);
-            RotationInRadians.Z = MathHelper.ToRadians(45);
+            RotationInRadians.X = MathHelper.ToRadians(0);
+            RotationInRadians.Z = MathHelper.ToRadians(0);
 
             ScalePercent = new Vector3(1, 1, 1);
         }

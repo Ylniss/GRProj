@@ -53,9 +53,8 @@ namespace ArcheryGame
             sky = new Skydome(this);
             sky.Initialize();
 
-            sky.Position = new Vector3(50, 40, -50);
-            sky.ScalePercent = new Vector3(15, 15, 15);
-            sky.RotationInRadians = new Vector3(1, 90, 90);
+            sky.Position = new Vector3(50, -50, -50);
+            sky.ScalePercent = new Vector3(400, 400, 400);
 
             effect = new BasicEffect(graphics.GraphicsDevice);
      
@@ -153,7 +152,9 @@ namespace ArcheryGame
                     continue;
 
                 var gameObject = (gameObj as DrawableGameObject);
-
+                var rs = new RasterizerState();
+                rs.CullMode = CullMode.None;
+                GraphicsDevice.RasterizerState = rs;
 
                 foreach (ModelMesh mesh in model.Meshes)
                 {

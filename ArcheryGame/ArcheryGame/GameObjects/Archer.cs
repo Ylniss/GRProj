@@ -180,7 +180,7 @@ namespace ArcheryGame.GameObjects
             arrow.LoadContent(Game.Content, "Arrow");
             arrow.Position = Position;
             arrow.Direction = Rotation;
-            arrow.RotationInRadians = new Vector3(Rotation.X, Rotation.Y, Rotation.Z + 45); 
+            arrow.RotationInRadians = new Vector3(Rotation.X, Rotation.Y, Rotation.Z); 
             //    arrow.Direction.Normalize();
             arrow.Fire();
         }
