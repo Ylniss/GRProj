@@ -9,9 +9,19 @@ namespace ArcheryGame.GameObjects
 {
     public class Skydome : DrawableGameObject
     {
-
         public Skydome(Game game) : base(game)
         {
+            LoadContent(game.Content, "skydome1");
+            ScalePercent = new Vector3(900, 900, 900);
+            Position.Y = -50f;
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+
+            Position.X = Services.Camera.Position.X;
+            Position.Z = Services.Camera.Position.Z;
 
         }
     }

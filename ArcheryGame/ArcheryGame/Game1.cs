@@ -44,17 +44,14 @@ namespace ArcheryGame
 
             ArcheryGame.Services.Initialize(this, GraphicsDevice, camera);
 
-            terrain = new TerrainGenerator(Content, "sand", "grass", "stone", "heightmap4");
+            terrain = new TerrainGenerator(this, "sand", "grass", "stone", "heightmap4");
             terrain.Initialize();
 
-            archer = new Archer(this, new Vector3(1, 30, -1), Vector3.Zero, 10, terrain.HeightData);
+            archer = new Archer(this, new Vector3(15, 30, -15), Vector3.Zero, 10, terrain);
             archer.Initialize();
 
             sky = new Skydome(this);
             sky.Initialize();
-
-            sky.Position = new Vector3(50, -50, -50);
-            sky.ScalePercent = new Vector3(400, 400, 400);
 
             effect = new BasicEffect(graphics.GraphicsDevice);
      
@@ -68,8 +65,6 @@ namespace ArcheryGame
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            sky.LoadContent(Content, "skydome");
 
             //arrow.LoadContent(Content, "Arrow");
             font = Content.Load<SpriteFont>("Standard");
@@ -160,7 +155,7 @@ namespace ArcheryGame
                 {
                     foreach (BasicEffect effect in mesh.Effects)
                     {
-                        effect.EnableDefaultLighting();
+                        //effect.EnableDefaultLighting();
                         effect.AmbientLightColor = new Vector3(1f, 0, 0);
                         effect.View = viewMatrix;
                         effect.World = gameObject.WorldMatrix;

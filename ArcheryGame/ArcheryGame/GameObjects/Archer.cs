@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ArcheryGame.TerrainGeneration;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
@@ -6,7 +7,7 @@ namespace ArcheryGame.GameObjects
 {
     public class Archer : DrawableGameObject
     {
-        private float[,] heightData;
+        private TerrainGenerator terrain;
 
         private Vector3 position;
         private Vector3 rotation;
@@ -37,8 +38,6 @@ namespace ArcheryGame.GameObjects
             }
         }
 
-
-
         public List<Arrow> Arrows { get; set; }
 
         //defines speed of movement
@@ -52,17 +51,17 @@ namespace ArcheryGame.GameObjects
 
         private bool shoot = false;
 
-        public Archer(Game game, Vector3 position, Vector3 rotation, float speed, float[,] heightData) 
+        public Archer(Game game, Vector3 position, Vector3 rotation, float speed, TerrainGenerator terrain) 
             : base(game)
         {
             Position = position;
             Rotation = rotation;
             this.speed = speed;
-            this.heightData = heightData;
-	    Arrows = new List<Arrow>();
-            previoustMouseState = Mouse.GetState();
-            
 
+            this.terrain = terrain;
+
+	        Arrows = new List<Arrow>();
+            previoustMouseState = Mouse.GetState();
         }
 
         public override void Initialize()
@@ -84,9 +83,11 @@ namespace ArcheryGame.GameObjects
 
             currentMouseState = mouseState;
 
+            CheckCollisionWithMapBorders();
+
             if (mouseState.LeftButton == ButtonState.Pressed && !shoot)
             {
-                Shot();
+                Shoot();
                 shoot = true;
              }
 
@@ -107,7 +108,7 @@ namespace ArcheryGame.GameObjects
             if (keyboardState.IsKeyDown(Keys.D))
                 moveVector.X = -1.0f;
 
-            position.Y = CalculateHeight(12.0f);
+            position.Y = CalculateHeight(102.0f);
 
             if (moveVector != Vector3.Zero)
             {
@@ -173,7 +174,7 @@ namespace ArcheryGame.GameObjects
             Rotation = rotation;
         }
 
-        private void Shot()
+        private void Shoot()
         {
             var arrow = new Arrow(Game,Position);
             Arrows.Add(arrow);
@@ -185,15 +186,32 @@ namespace ArcheryGame.GameObjects
             arrow.Fire();
         }
 
+        private void CheckCollisionWithMapBorders()
+        {
+            int offset = 5;
+
+            if (Position.X < offset)
+                Position = new Vector3(offset, position.Y, position.Z);
+            if (Position.X > terrain.TerrainWidth - offset)
+                Position = new Vector3(terrain.TerrainWidth - offset, position.Y, position.Z);
+
+            offset *= -1;
+
+            if (Position.Z > offset)
+                Position = new Vector3(position.X, position.Y, offset);
+            if (Position.Z < -terrain.TerrainWidth - offset)
+                Position = new Vector3(position.X, position.Y, -terrain.TerrainWidth - offset);
+        }
+
         private float CalculateHeight(float offset)
         {
             float[] closestPoints = new float[5];
 
-            closestPoints[0] = heightData[(int)position.X, (int)-position.Z];
-            closestPoints[1] = heightData[(int)position.X + 1, (int)-position.Z];
-            closestPoints[2] = heightData[(int)position.X, (int)-position.Z + 1];
-            closestPoints[3] = heightData[(int)position.X - 1, (int)-position.Z];
-            closestPoints[4] = heightData[(int)position.X, (int)-position.Z - 1];
+            closestPoints[0] = terrain.HeightData[(int)position.X, (int)-position.Z];
+            closestPoints[1] = terrain.HeightData[(int)position.X + 1, (int)-position.Z];
+            closestPoints[2] = terrain.HeightData[(int)position.X, (int)-position.Z + 1];
+            closestPoints[3] = terrain.HeightData[(int)position.X - 1, (int)-position.Z];
+            closestPoints[4] = terrain.HeightData[(int)position.X, (int)-position.Z - 1];
 
             float height = 0f;
             foreach (float point in closestPoints)

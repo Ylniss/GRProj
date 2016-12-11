@@ -22,7 +22,7 @@ namespace ArcheryGame
         public Vector3 RotationVelocity;
         public Vector3 RotationAcceleration;
 
-         public virtual Matrix WorldMatrix
+        public virtual Matrix WorldMatrix
         {
             get
             {

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
+using ArcheryGame.GameObjects;
 
 namespace ArcheryGame.TerrainGeneration
 {
@@ -27,15 +28,19 @@ namespace ArcheryGame.TerrainGeneration
         Texture2D grassTexture;
 
         private ContentManager content;
+        private Game game;
 
         private string assetGrassTexture;
         private string assetSandTexture;
         private string assetRockTexture;
         private string assetHeightMap;
 
-        public TerrainGenerator(ContentManager content, string assetGrassTexture, string assetSandTexture, string assetRockTexture, string assetHeightMap)
+        private List<Wall> walling = new List<Wall>();
+
+        public TerrainGenerator(Game game, string assetGrassTexture, string assetSandTexture, string assetRockTexture, string assetHeightMap)
         {
-            this.content = content;
+            this.game = game;
+            this.content = game.Content;
 
             this.assetGrassTexture = assetGrassTexture;
             this.assetSandTexture = assetSandTexture;
@@ -66,6 +71,21 @@ namespace ArcheryGame.TerrainGeneration
                 Services.Graphics.SetVertexBuffer(terrainVertexBuffer);
 
                 Services.Graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, terrainVertexBuffer.VertexCount / 3);
+            }
+        }
+
+        public void GenerateWall()
+        {
+            for (int i = 0; i < TerrainLength / 10; i += 10)
+            {
+                walling.Add(new Wall(game, new Vector3 (i, 5f, 0f)));
+
+            }
+
+
+            foreach (Wall wall in walling)
+            {
+                wall.Initialize();
             }
         }
 
