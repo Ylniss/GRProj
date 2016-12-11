@@ -46,6 +46,7 @@ namespace ArcheryGame
 
             terrain = new TerrainGenerator(this, "sand", "grass", "stone", "heightmap4");
             terrain.Initialize();
+            terrain.GenerateWall();
 
             archer = new Archer(this, new Vector3(15, 30, -15), Vector3.Zero, 10, terrain);
             archer.Initialize();
@@ -134,6 +135,9 @@ namespace ArcheryGame
         private void DrawModels()
         {
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            var rs = new RasterizerState();
+            rs.CullMode = CullMode.None;
+            GraphicsDevice.RasterizerState = rs;
 
             foreach (var gameObj in Components)
             {
@@ -147,9 +151,7 @@ namespace ArcheryGame
                     continue;
 
                 var gameObject = (gameObj as DrawableGameObject);
-                var rs = new RasterizerState();
-                rs.CullMode = CullMode.None;
-                GraphicsDevice.RasterizerState = rs;
+
 
                 foreach (ModelMesh mesh in model.Meshes)
                 {

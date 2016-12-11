@@ -108,7 +108,7 @@ namespace ArcheryGame.GameObjects
             if (keyboardState.IsKeyDown(Keys.D))
                 moveVector.X = -1.0f;
 
-            position.Y = CalculateHeight(102.0f);
+            position.Y = CalculateHeight(10.0f);
 
             if (moveVector != Vector3.Zero)
             {

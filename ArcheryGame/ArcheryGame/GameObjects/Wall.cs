@@ -13,6 +13,7 @@ namespace ArcheryGame.GameObjects
         {
             LoadContent(game.Content, "sciana1");
             Position = position;
+            ScalePercent = new Vector3(1,10, 5);
         }
     }
 }

@@ -76,17 +76,32 @@ namespace ArcheryGame.TerrainGeneration
 
         public void GenerateWall()
         {
-            for (int i = 0; i < TerrainLength / 10; i += 10)
+            for (int i = 0; i < TerrainLength * 5; i += 20)
             {
-                walling.Add(new Wall(game, new Vector3 (i, 5f, 0f)));
+                for (int j = 0; j < 2; j++)
+                {
+                    var rightWall = new Wall(game, new Vector3(i, 0 + j * 60, 0)) { RotationInRadians = new Vector3(0, MathHelper.ToRadians(90), 0) };
+                    var leftWall = new Wall(game, new Vector3(i, 0 + j * 60, -TerrainWidth)) { RotationInRadians = new Vector3(0, MathHelper.ToRadians(90), 0) };
 
+                    walling.Add(rightWall);
+                    walling.Add(leftWall);
+                }
             }
 
+            for (int i = 0; i < TerrainWidth * 5; i += 20)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    var backWall = new Wall(game, new Vector3(0, 0 + j * 60, -i));
+                    var frontWall = new Wall(game, new Vector3(TerrainLength, 0 + j * 60, -i));
+
+                    walling.Add(backWall);
+                    walling.Add(frontWall);
+                }
+            }
 
             foreach (Wall wall in walling)
-            {
                 wall.Initialize();
-            }
         }
 
         public void Initialize()
