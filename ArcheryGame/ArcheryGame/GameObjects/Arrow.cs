@@ -30,7 +30,6 @@ namespace ArcheryGame
         {
             fired = false;
             Position = position;
-            Velocity.X = 0.5f;
 
             RotationInRadians.X = MathHelper.ToRadians(0);
             RotationInRadians.Z = MathHelper.ToRadians(0);
@@ -48,11 +47,18 @@ namespace ArcheryGame
             {
      
 
-                var rotationMatrix = Matrix.CreateRotationX(Direction.X) * Matrix.CreateRotationY(Direction.Y);
+               var rotationMatrix = Matrix.CreateRotationX(Direction.X) * Matrix.CreateRotationY(Direction.Y);
+            
+               Vector3 lookAtOffset = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
 
-                Vector3 lookAtOffset = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
+                var speed = 20f;
 
-               Position += lookAtOffset * 10.0f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                lookAtOffset = Vector3.Transform(lookAtOffset, Matrix.CreateTranslation(new Vector3(
+                    lookAtOffset.X * speed * elapsed * (float)Math.Cos(-Direction.X),
+                    speed * elapsed * (float)Math.Sin(-Direction.X) - (0.5f * 9.81f * elapsed * elapsed),
+                    lookAtOffset.Z * speed * elapsed * (float)Math.Cos(-Direction.X))));
+
+                Position += lookAtOffset * 10.0f * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
         }
