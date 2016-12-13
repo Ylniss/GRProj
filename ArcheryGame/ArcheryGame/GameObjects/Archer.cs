@@ -118,7 +118,7 @@ namespace ArcheryGame.GameObjects
 
             if (moveVector != Vector3.Zero)
             {
-                //normalizacja wektora zeby po skosach nie latac szybciej
+                //Normalizacja wektora zeby po skosach nie przemieszczać się szybciej.
                 moveVector.Normalize();
 
                 moveVector *= dt * speed;
@@ -158,26 +158,26 @@ namespace ArcheryGame.GameObjects
             base.Update(gameTime);
         }
 
-        private Vector3 PreviewMove(Vector3 ammount)
+        /// <summary>
+        /// Uwzględnienie rotacji kamery.
+        /// </summary>
+        /// <param name="moveVector"></param>
+        /// <returns></returns>
+        private Vector3 IncludeRotation(Vector3 moveVector)
         {
             var rotation = Matrix.CreateRotationY(Rotation.Y);
 
-            Vector3 movement = new Vector3(ammount.X, ammount.Y, ammount.Z);
+            Vector3 movement = new Vector3(moveVector.X, moveVector.Y, moveVector.Z);
 
             movement = Vector3.Transform(movement, rotation);
 
             return Position + movement;
         }
 
-        private void Move(Vector3 scale)
+        private void Move(Vector3 moveVector)
         {
-            MoveTo(PreviewMove(scale), Rotation);
-        }
-
-        private void MoveTo(Vector3 position, Vector3 rotation)
-        {
-            Position = position;
-            Rotation = rotation;
+            Position = IncludeRotation(moveVector);
+            Rotation = Rotation;
         }
 
         private void Shoot()

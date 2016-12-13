@@ -23,6 +23,8 @@ namespace ArcheryGame.GameObjects
             Position.X = Services.Camera.Position.X;
             Position.Z = Services.Camera.Position.Z;
 
+            RotationInRadians.Y += 0.0001f;
+
         }
     }
 }
