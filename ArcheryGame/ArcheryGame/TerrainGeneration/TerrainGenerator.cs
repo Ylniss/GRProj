@@ -54,6 +54,7 @@ namespace ArcheryGame.TerrainGeneration
             effect.Parameters["xTexture0"].SetValue(sandTexture);
             effect.Parameters["xTexture1"].SetValue(grassTexture);
             effect.Parameters["xTexture2"].SetValue(rockTexture);
+            effect.Parameters["xTexture3"].SetValue(rockTexture);
 
             Matrix worldMatrix = Matrix.Identity;
             effect.Parameters["xWorld"].SetValue(worldMatrix);
@@ -61,7 +62,7 @@ namespace ArcheryGame.TerrainGeneration
             effect.Parameters["xProjection"].SetValue(currentProjectionMatrix);
 
             effect.Parameters["xEnableLighting"].SetValue(true);
-            effect.Parameters["xAmbient"].SetValue(0.4f);
+            effect.Parameters["xAmbient"].SetValue(1f);
             effect.Parameters["xLightDirection"].SetValue(new Vector3(-0.5f, -1, -0.5f));
 
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
@@ -167,14 +168,17 @@ namespace ArcheryGame.TerrainGeneration
                     terrainVertices[x + y * TerrainWidth].TexWeights.X = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 0) / 8.0f, 0, 1);
                     terrainVertices[x + y * TerrainWidth].TexWeights.Y = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 12) / 6.0f, 0, 1);
                     terrainVertices[x + y * TerrainWidth].TexWeights.Z = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 20) / 6.0f, 0, 1);
+                    terrainVertices[x + y * TerrainWidth].TexWeights.W = MathHelper.Clamp(1.0f - Math.Abs(HeightData[x, y] - 30) / 6.0f, 0, 1);
 
                     float total = terrainVertices[x + y * TerrainWidth].TexWeights.X;
                     total += terrainVertices[x + y * TerrainWidth].TexWeights.Y;
                     total += terrainVertices[x + y * TerrainWidth].TexWeights.Z;
+                    total += terrainVertices[x + y * TerrainWidth].TexWeights.W;
 
                     terrainVertices[x + y * TerrainWidth].TexWeights.X /= total;
                     terrainVertices[x + y * TerrainWidth].TexWeights.Y /= total;
                     terrainVertices[x + y * TerrainWidth].TexWeights.Z /= total;
+                    terrainVertices[x + y * TerrainWidth].TexWeights.W /= total;
                 }
             }
 

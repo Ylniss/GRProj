@@ -32,7 +32,10 @@ sampler TextureSampler0 = sampler_state { texture = <xTexture0>; magfilter = LIN
 
 sampler TextureSampler1 = sampler_state { texture = <xTexture1>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = wrap; AddressV = wrap; }; Texture xTexture2;
 
-sampler TextureSampler2 = sampler_state { texture = <xTexture2>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = mirror; AddressV = mirror; };
+sampler TextureSampler2 = sampler_state { texture = <xTexture2>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = mirror; AddressV = mirror; }; Texture xTexture3;
+
+sampler TextureSampler3 = sampler_state { texture = <xTexture3>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = mirror; AddressV = mirror; };
+
 //------- Technique: Textured --------
 struct TVertexToPixel
 {
@@ -129,13 +132,14 @@ MTPixelToFrame MultiTexturedPS(MTVertexToPixel PSIn)
     MTPixelToFrame Output = (MTPixelToFrame)0;        
     
     float lightingFactor = 1;
-    if (xEnableLighting)
+    if (xEnableLighting) //TODO: blad, oswietlenie jest przezroczyste
         lightingFactor = saturate(saturate(dot(PSIn.Normal, PSIn.LightDirection)) + xAmbient);
         
     Output.Color = tex2D(TextureSampler0, PSIn.TextureCoords)*PSIn.TextureWeights.x;
     Output.Color += tex2D(TextureSampler1, PSIn.TextureCoords)*PSIn.TextureWeights.y;
     Output.Color += tex2D(TextureSampler2, PSIn.TextureCoords)*PSIn.TextureWeights.z;
-        
+	Output.Color += tex2D(TextureSampler3, PSIn.TextureCoords)*PSIn.TextureWeights.w;
+
     Output.Color *= lightingFactor;
     
     return Output;

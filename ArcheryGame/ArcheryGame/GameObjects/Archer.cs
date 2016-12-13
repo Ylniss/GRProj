@@ -12,6 +12,8 @@ namespace ArcheryGame.GameObjects
         private Vector3 position;
         private Vector3 rotation;
 
+        private Bow bow;
+
         new public Vector3 Position
         {
             get
@@ -60,6 +62,8 @@ namespace ArcheryGame.GameObjects
 
             this.terrain = terrain;
 
+            //bow = new Bow(game, position);
+
 	        Arrows = new List<Arrow>();
             previoustMouseState = Mouse.GetState();
         }
@@ -69,6 +73,8 @@ namespace ArcheryGame.GameObjects
             Mouse.SetPosition(Game.Window.ClientBounds.Width / 2, Game.Window.ClientBounds.Height / 2);
 
             prevMouseState = Mouse.GetState();
+
+            //bow.Initialize();
 
             base.Initialize();
         }

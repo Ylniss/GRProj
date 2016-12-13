@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="GameObjects\Archer.cs" />
     <Compile Include="GameObjects\Arrow.cs" />
+    <Compile Include="GameObjects\Bow.cs" />
     <Compile Include="GameObjects\Camera.cs" />
     <Compile Include="GameObjects\DrawableGameObject.cs" />
     <Compile Include="Game1.cs" />
