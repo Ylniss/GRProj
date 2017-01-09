@@ -46,6 +46,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\Skydome.cs" />
+    <Compile Include="GameObjects\Target.cs" />
     <Compile Include="GameObjects\Wall.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

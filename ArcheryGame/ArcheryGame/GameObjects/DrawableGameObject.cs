@@ -26,5 +26,6 @@ namespace ArcheryGame
         {
             base.Draw(gameTime);
         }
+
     }
 }

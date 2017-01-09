@@ -26,6 +26,10 @@ namespace ArcheryGame
         //  private Arrow arrow;
         private Skydome sky;
 
+        private Target target;
+
+        private int score = 0;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -33,7 +37,7 @@ namespace ArcheryGame
             graphics.PreferredBackBufferWidth = 1024;
             graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
-    
+
             Content.RootDirectory = "Content";
         }
 
@@ -54,8 +58,11 @@ namespace ArcheryGame
             sky = new Skydome(this);
             sky.Initialize();
 
+            target = new Target(this, new Vector3(20, 15, -20));
+            target.Initialize();
+
             effect = new BasicEffect(graphics.GraphicsDevice);
-     
+
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), graphics.GraphicsDevice.Viewport.AspectRatio, 1f, 1000f);
             viewMatrix = camera.View;
             worldMatrix = Matrix.Identity;
@@ -85,11 +92,11 @@ namespace ArcheryGame
             if (IsActive)
             {
 
-                if(Keyboard.GetState().IsKeyDown(Keys.K))
+                if (Keyboard.GetState().IsKeyDown(Keys.K))
                 {
                     archer.Arrows.Clear();
                     var arrows = Components.Where(x => x.GetType() == typeof(Arrow)).ToList();
-                 
+
                     for (int i = 0; i < arrows.Count(); i++)
                         Components.Remove(arrows[i]);
 
@@ -101,6 +108,16 @@ namespace ArcheryGame
                 // arrow.Update(gameTime);
 
                 viewMatrix = camera.View;
+
+                foreach (var arrow in archer.Arrows)
+                {
+                    if (IsCollision(arrow.Model, arrow.WorldMatrix, target.Model, target.WorldMatrix))
+                    {
+                        target.RandomizePosition(terrain.TerrainLength, terrain.TerrainWidth);
+                        ++score;
+                    }
+
+                }
 
                 base.Update(gameTime);
             }
@@ -124,11 +141,13 @@ namespace ArcheryGame
             //    message2 +=  string.Format("Arrow number: {0}, Position: {1}\n RotationInRadians: {2}\nRotationAcceleration: {3}\nRotationVelocity: {3}\n",i, item.Position, item.RotationInRadians, item.RotationAcceleration, item.RotationVelocity);
             //    i++;
             //}
-            //spriteBatch.Begin();
-       
+            spriteBatch.Begin();
             //spriteBatch.DrawString(font, message, Vector2.Zero, Color.Black);
             //spriteBatch.DrawString(font, message2, new Vector2(0, 80), Color.Black);
-            //spriteBatch.End();
+
+            spriteBatch.DrawString(font, "Score: " + score, new Vector2(0, 80), Color.Yellow);
+
+            spriteBatch.End();
             base.Draw(gameTime);
         }
 
@@ -168,5 +187,25 @@ namespace ArcheryGame
             }
         }
 
+        private bool IsCollision(Model model1, Matrix world1, Model model2, Matrix world2)
+        {
+            for (int meshIndex1 = 0; meshIndex1 < model1.Meshes.Count; meshIndex1++)
+            {
+                BoundingSphere sphere1 = model1.Meshes[meshIndex1].BoundingSphere;
+                sphere1 = sphere1.Transform(world1);
+
+                sphere1.Radius = 0.001f;
+
+                for (int meshIndex2 = 0; meshIndex2 < model2.Meshes.Count; meshIndex2++)
+                {
+                    BoundingSphere sphere2 = model2.Meshes[meshIndex2].BoundingSphere;
+                    sphere2 = sphere2.Transform(world2);
+
+                    if (sphere1.Intersects(sphere2))
+                        return true;
+                }
+            }
+            return false;
+        }
     }
 }
