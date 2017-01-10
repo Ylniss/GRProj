@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
 namespace ArcheryGame
@@ -47,18 +43,16 @@ namespace ArcheryGame
 
             if (fired)
             {
-                var speed = arrowForce;
-
                 var rotationMatrix = Matrix.CreateRotationX(Direction.X) * Matrix.CreateRotationY(Direction.Y);
 
                 Vector3 lookAtOffset = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
 
                 lookAtOffset = Vector3.Transform(lookAtOffset, Matrix.CreateTranslation(new Vector3(
-                    lookAtOffset.X * speed * elapsed * (float)Math.Cos(-Direction.X),
-                    speed * elapsed * (float)Math.Sin(-Direction.X) - (0.5f * 9.81f * elapsed * elapsed),
-                    lookAtOffset.Z * speed * elapsed * (float)Math.Cos(-Direction.X))));
+                    lookAtOffset.X * arrowForce * elapsed * (float)Math.Cos(-Direction.X),
+                    arrowForce * elapsed * (float)Math.Sin(-Direction.X) - (0.5f * 9.81f * elapsed * elapsed),
+                    lookAtOffset.Z * arrowForce * elapsed * (float)Math.Cos(-Direction.X))));
 
-
+                RotationInRadians.X += 1/(arrowForce * 10f);
 
                 Position += lookAtOffset;
             }
@@ -70,7 +64,5 @@ namespace ArcheryGame
             this.arrowForce = arrowForce;
             fired = true;
         }
-
-
     }
 }
