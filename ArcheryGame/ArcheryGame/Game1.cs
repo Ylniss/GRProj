@@ -3,6 +3,7 @@ using ArcheryGame.TerrainGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Linq;
 
 namespace ArcheryGame
@@ -105,18 +106,26 @@ namespace ArcheryGame
                 archer.Update(gameTime);
                 camera.Update(gameTime);
                 sky.Update(gameTime);
-                // arrow.Update(gameTime);
 
                 viewMatrix = camera.View;
-
-                foreach (var arrow in archer.Arrows)
+                for (int i = 0; i < archer.Arrows.Count; i++)
                 {
-                    if (IsCollision(arrow.Model, arrow.WorldMatrix, target.Model, target.WorldMatrix))
+                    if (archer.Arrows[i].Position.Y < -20)
                     {
-                        target.RandomizePosition(terrain.TerrainLength, terrain.TerrainWidth);
-                        ++score;
+                        Components.Remove(archer.Arrows[i]);
+                        archer.Arrows.RemoveAt(i);
+                        --score;
+                        continue;
                     }
 
+                    if (IsCollision(archer.Arrows[i].Model, archer.Arrows[i].WorldMatrix, target.Model, target.WorldMatrix))
+                    {
+                      
+                        target.RandomizePosition(terrain.TerrainLength, terrain.TerrainWidth);
+                        score += (Int32) Vector3.Distance(archer.Position, archer.Arrows[i].Position) / 10;
+                        Components.Remove(archer.Arrows[i]);
+                        archer.Arrows.RemoveAt(i);
+                    }
                 }
 
                 base.Update(gameTime);
@@ -146,6 +155,7 @@ namespace ArcheryGame
             //spriteBatch.DrawString(font, message2, new Vector2(0, 80), Color.Black);
 
             spriteBatch.DrawString(font, "Score: " + score, new Vector2(0, 80), Color.Yellow);
+            spriteBatch.DrawString(font, String.Format("Arrow force: {0:0.00} %", archer.ArrowForce * 5), new Vector2(0, 160), Color.Yellow);
 
             spriteBatch.End();
             base.Draw(gameTime);

@@ -11,6 +11,7 @@ namespace ArcheryGame.GameObjects
 
         private Vector3 position;
         private Vector3 rotation;
+        private float arrowForce;
 
         private Bow bow;
 
@@ -42,6 +43,22 @@ namespace ArcheryGame.GameObjects
 
         public List<Arrow> Arrows { get; set; }
 
+        public float ArrowForce
+        {
+            get { return arrowForce; }
+            set
+            {
+                if (value > 20)
+                    arrowForce = 20;
+                else if (value < 0)
+                    arrowForce = 0;
+                else
+                    arrowForce = value;
+            }
+        }
+
+        private float mouseClipPoint;
+
         //defines speed of movement
         float speed = 10;
         float rotationSpeed = 0.1f;
@@ -51,7 +68,7 @@ namespace ArcheryGame.GameObjects
         private MouseState previoustMouseState;
         private MouseState prevMouseState;
 
-        private bool shoot = false;
+        private bool readyToShoot = false;
 
         public Archer(Game game, Vector3 position, Vector3 rotation, float speed, TerrainGenerator terrain) 
             : base(game)
@@ -73,7 +90,7 @@ namespace ArcheryGame.GameObjects
             Mouse.SetPosition(Game.Window.ClientBounds.Width / 2, Game.Window.ClientBounds.Height / 2);
 
             prevMouseState = Mouse.GetState();
-
+            mouseClipPoint = Game.Window.ClientBounds.Height / 2;
             //bow.Initialize();
 
             base.Initialize();
@@ -87,19 +104,24 @@ namespace ArcheryGame.GameObjects
             var keyboardState = Keyboard.GetState();
             var mouseState = Mouse.GetState();
 
+           
             currentMouseState = mouseState;
 
             CheckCollisionWithMapBorders();
 
-            if (mouseState.LeftButton == ButtonState.Pressed && !shoot)
+            if (mouseState.LeftButton == ButtonState.Pressed && !readyToShoot)
             {
-                Shoot();
-                shoot = true;
+                readyToShoot = true;
+                mouseClipPoint = mouseState.Position.Y;
              }
 
-            if (mouseState.LeftButton == ButtonState.Released)
+            if (mouseState.LeftButton == ButtonState.Released && readyToShoot)
             {
-                shoot = false;
+                readyToShoot = false;
+                previoustMouseState = currentMouseState;
+
+                if(ArrowForce > 0)
+                    Shoot();
             }
 
             if (keyboardState.IsKeyDown(Keys.W))
@@ -126,34 +148,39 @@ namespace ArcheryGame.GameObjects
                 Move(moveVector);
             }
 
-            //Ruch myszką
-            float deltaX;
-            float deltaY;
-
-            if (currentMouseState != previoustMouseState)
+            if (!readyToShoot)
             {
-                deltaX = currentMouseState.X - Game.GraphicsDevice.Viewport.Width / 2;
-                deltaY = currentMouseState.Y - Game.GraphicsDevice.Viewport.Height / 2;
+                //Ruch myszką
+                float deltaX;
+                float deltaY;
 
-                mouseRotationBuffer.X -= rotationSpeed * deltaX * dt;
-                mouseRotationBuffer.Y -= rotationSpeed * deltaY * dt;
+                if (currentMouseState != previoustMouseState)
+                {
+                    deltaX = currentMouseState.X - Game.GraphicsDevice.Viewport.Width / 2;
+                    deltaY = currentMouseState.Y - Game.GraphicsDevice.Viewport.Height / 2;
 
-                if (mouseRotationBuffer.Y < MathHelper.ToRadians(-75.0f))
-                    mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(-75.0f));
+                    mouseRotationBuffer.X -= rotationSpeed * deltaX * dt;
+                    mouseRotationBuffer.Y -= rotationSpeed * deltaY * dt;
 
-                if (mouseRotationBuffer.Y > MathHelper.ToRadians(75.0f))
-                    mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(75.0f));
+                    if (mouseRotationBuffer.Y < MathHelper.ToRadians(-75.0f))
+                        mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(-75.0f));
 
-                Rotation = new Vector3(-MathHelper.Clamp(mouseRotationBuffer.Y, MathHelper.ToRadians(-75.0f), MathHelper.ToRadians(75.0f)),
-                    MathHelper.WrapAngle(mouseRotationBuffer.X), 0);
+                    if (mouseRotationBuffer.Y > MathHelper.ToRadians(75.0f))
+                        mouseRotationBuffer.Y = mouseRotationBuffer.Y - (mouseRotationBuffer.Y - MathHelper.ToRadians(75.0f));
 
-                deltaX = 0;
-                deltaY = 0;
+                    Rotation = new Vector3(-MathHelper.Clamp(mouseRotationBuffer.Y, MathHelper.ToRadians(-75.0f), MathHelper.ToRadians(75.0f)),
+                        MathHelper.WrapAngle(mouseRotationBuffer.X), 0);
+
+                    deltaX = 0;
+                    deltaY = 0;
+                }
+
+                Mouse.SetPosition(Game.GraphicsDevice.Viewport.Width / 2, Game.GraphicsDevice.Viewport.Height / 2);
+
+                previoustMouseState = currentMouseState;
             }
 
-            Mouse.SetPosition(Game.GraphicsDevice.Viewport.Width / 2, Game.GraphicsDevice.Viewport.Height / 2);
-
-            previoustMouseState = currentMouseState;
+            ArrowForce = (mouseState.Position.Y - mouseClipPoint) / 25f;
 
             base.Update(gameTime);
         }
@@ -189,7 +216,7 @@ namespace ArcheryGame.GameObjects
             arrow.Direction = Rotation;
             arrow.RotationInRadians = new Vector3(Rotation.X, Rotation.Y, Rotation.Z); 
             //    arrow.Direction.Normalize();
-            arrow.Fire();
+            arrow.Fire(ArrowForce);
         }
 
         private void CheckCollisionWithMapBorders()

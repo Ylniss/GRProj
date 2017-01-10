@@ -13,6 +13,8 @@ namespace ArcheryGame
 
         private bool fired;
         private float elapsed;
+        private float arrowForce;
+
         public Vector3 Direction { get; set; }
 
         public override Matrix WorldMatrix
@@ -45,7 +47,7 @@ namespace ArcheryGame
 
             if (fired)
             {
-                var speed = 10f;
+                var speed = arrowForce;
 
                 var rotationMatrix = Matrix.CreateRotationX(Direction.X) * Matrix.CreateRotationY(Direction.Y);
 
@@ -56,13 +58,16 @@ namespace ArcheryGame
                     speed * elapsed * (float)Math.Sin(-Direction.X) - (0.5f * 9.81f * elapsed * elapsed),
                     lookAtOffset.Z * speed * elapsed * (float)Math.Cos(-Direction.X))));
 
+
+
                 Position += lookAtOffset;
             }
 
         }
 
-        public void Fire()
+        public void Fire(float arrowForce)
         {
+            this.arrowForce = arrowForce;
             fired = true;
         }
 
