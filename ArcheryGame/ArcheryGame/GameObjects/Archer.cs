@@ -13,8 +13,6 @@ namespace ArcheryGame.GameObjects
         private Vector3 rotation;
         private float arrowForce;
 
-        private Bow bow;
-
         new public Vector3 Position
         {
             get
